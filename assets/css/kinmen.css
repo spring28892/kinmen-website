@@ -1,0 +1,905 @@
+/* ==========================================================================
+   金門縣水土保持服務團 — 駐點時間與水保宣導
+   視覺主題：金門的地層剖面。一層薄紅土，底下是花崗片麻岩。
+   配色與分隔線都從這道接縫長出來；紅土只走線條，灰岩承載版面。
+   所有選擇器都以 .km- 開頭，不影響佈景主題既有頁面。
+   ========================================================================== */
+
+:root {
+  --km-ink:        #2F3538;   /* 花崗片麻岩 — 內文 */
+  --km-stone:      #5C6468;   /* 次要文字 */
+  /* 已結束的場次靠「字重」而不是「更淡的灰」來區分。
+     再淡下去就過不了 WCAG AA 的 4.5:1，而這些日期仍然是要看得懂的資訊。 */
+  --km-laterite:   #9A3A1B;   /* 紅土 — 結構線與序號 */
+  --km-sea:        #14595C;   /* 海峽深青 — 連結與互動 */
+  --km-sea-deep:   #0D3E40;
+  --km-ground:     #F9F9F7;   /* 頁面底 */
+  --km-seam:       #E4E4DE;   /* 帶狀區塊底 */
+  --km-seam-line:  #CFD0C9;
+
+  --km-serif: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "MingLiU", serif;
+  --km-sans:  "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Heiti TC", sans-serif;
+
+  --km-measure: 34em;   /* 中文約 34 字一行 */
+  --km-wrap: 66rem;
+}
+
+/* --------------------------------------------------------------- 版面骨架 */
+
+.km-band {
+  background: var(--km-ground);
+  padding: 3.5rem 0;
+}
+.km-band--seam {
+  background: var(--km-seam);
+}
+/* 任何兩個相鄰區塊之間都要有一道界線，同底色相接時尤其需要 */
+.km-band + .km-band {
+  border-top: 1px solid var(--km-seam-line);
+}
+
+.km-wrap {
+  max-width: var(--km-wrap);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+.km-wrap--text {
+  max-width: 48rem;
+}
+
+/* --------------------------------------------------------------- 共用文字 */
+
+/* 字體與文字色只設在容器上，靠繼承往下傳。
+   若改成 .km-band p {} 這類「類別＋元素」選擇器，特異性會高過底下所有
+   單一類別的元件樣式，把元件自己的顏色蓋掉。 */
+.km-band {
+  font-family: var(--km-serif);
+  color: var(--km-ink);
+}
+
+.km-title {
+  font-family: var(--km-serif);
+  font-weight: 700;
+  font-size: 2.25rem;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  margin: 0 0 1rem;
+  color: var(--km-ink);
+}
+.km-lede {
+  font-family: var(--km-serif);
+  font-size: 1.125rem;
+  line-height: 1.95;
+  color: var(--km-stone);
+  max-width: var(--km-measure);
+  margin: 0;
+}
+
+.km-h2 {
+  font-family: var(--km-serif);
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: var(--km-ink);
+  margin: 0 0 1.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--km-seam-line);
+}
+
+.km-sr {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+/* 鍵盤焦點，全站一致 */
+.km-band a:focus-visible,
+.km-nav a:focus-visible,
+.km-strip a:focus-visible,
+.km-year__scroll:focus-visible,
+.km-button:focus-visible {
+  outline: 3px solid var(--km-sea);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* --------------------------------------------------------------- 主導覽列 */
+
+.km-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--km-ground);
+  border-bottom: 3px solid var(--km-laterite);
+}
+.km-nav__list {
+  max-width: var(--km-wrap);
+  margin: 0 auto;
+  padding: 0 1rem;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.km-nav__list > li { margin: 0; }
+.km-nav__list a {
+  display: block;
+  font-family: var(--km-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--km-ink);
+  text-decoration: none;
+  padding: 0.95rem 1.1rem;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -3px;
+}
+.km-nav__list a:hover,
+.km-nav__list a:focus {
+  color: var(--km-sea);
+  background: var(--km-seam);
+}
+.km-nav__list a[aria-current="page"] {
+  color: var(--km-laterite);
+  font-weight: 700;
+  border-bottom-color: var(--km-ink);
+}
+
+/* --------------------------------------------- 半日標記：本設計的核心圖形 */
+/* 一個一分為二的方塊。左半填滿＝上午，右半填滿＝下午。 */
+
+.km-half {
+  display: inline-flex;
+  width: 2.25rem;
+  height: 0.95rem;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+  overflow: hidden;
+  flex: none;
+  vertical-align: -0.1em;
+}
+.km-half span {
+  flex: 1 1 50%;
+  background: transparent;
+}
+.km-half span + span { border-left: 1.5px solid currentColor; }
+.km-half--am span:first-child { background: currentColor; }
+.km-half--pm span:last-child  { background: currentColor; }
+
+.km-half--lg {
+  width: 4rem;
+  height: 1.6rem;
+  border-width: 2px;
+}
+.km-half--lg span + span { border-left-width: 2px; }
+
+/* ------------------------------------------------------- 首頁：駐點提示條 */
+
+.km-strip {
+  background: var(--km-seam);
+  color: var(--km-ink);
+  border-bottom: 1px solid var(--km-seam-line);
+}
+.km-strip__inner {
+  max-width: var(--km-wrap);
+  margin: 0 auto;
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 1.1rem;
+  font-family: var(--km-sans);
+  font-size: 1rem;
+}
+.km-strip__label {
+  /* 和駐點頁的「下一次駐點」同一個處理 */
+  font-weight: 700;
+  color: var(--km-laterite);
+  letter-spacing: 0.14em;
+  flex: none;
+}
+.km-strip__when {
+  font-weight: 700;
+  color: var(--km-ink);
+  letter-spacing: 0.02em;
+}
+.km-strip__when .km-half { color: var(--km-laterite); margin: 0 0.4rem; }
+.km-strip a {
+  color: var(--km-sea);
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+  margin-left: auto;
+  flex: none;
+}
+.km-strip a:hover, .km-strip a:focus { color: var(--km-sea-deep); }
+
+/* ------------------------------------------------- 駐點頁：下一次駐點方框 */
+/* 全站唯一的方框。重點只放這一處。 */
+
+.km-next {
+  padding-top: 2.5rem;
+}
+.km-next__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 1rem;
+}
+.km-next__label {
+  font-family: var(--km-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--km-laterite);
+  margin: 0;
+}
+.km-next__count {
+  font-family: var(--km-sans);
+  font-size: 1rem;
+  color: var(--km-stone);
+  margin: 0;
+}
+.km-next__card {
+  border: 1px solid var(--km-seam-line);
+  background: var(--km-ground);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.km-next__rule {
+  height: 6px;
+  background: var(--km-laterite);
+  transform-origin: left center;
+}
+.km-next__days {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.km-next__day {
+  padding: 1.75rem 1.5rem 1.9rem;
+}
+.km-next__day + .km-next__day {
+  border-left: 1px solid var(--km-seam-line);
+}
+.km-next__date {
+  font-family: var(--km-serif);
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--km-ink);
+  margin: 0;
+}
+.km-next__date b {
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--km-stone);
+  margin-left: 0.5rem;
+  letter-spacing: 0.08em;
+}
+.km-next__mark {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1.1rem 0 0;
+  color: var(--km-laterite);
+  font-family: var(--km-sans);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+.km-next__hours {
+  font-family: var(--km-sans);
+  font-size: 1.125rem;
+  color: var(--km-ink);
+  margin: 0.45rem 0 0;
+  letter-spacing: 0.02em;
+}
+.km-next__closed {
+  padding: 2rem 1.5rem;
+  margin: 0;
+  font-size: 1.125rem;
+  line-height: 1.9;
+  color: var(--km-stone);
+  max-width: var(--km-measure);
+}
+
+/* 這一趟駐點裡已經過去的那個半天 */
+.km-next__day.is-done .km-next__date {
+  font-weight: 400;
+  color: var(--km-stone);
+}
+.km-next__day.is-done .km-next__hours,
+.km-next__day.is-done .km-next__mark { color: var(--km-stone); }
+.km-next__done {
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--km-stone);
+}
+
+.km-strip__count {
+  font-family: var(--km-sans);
+  color: var(--km-stone);
+  letter-spacing: 0.06em;
+}
+
+/* 全頁唯一的自動動態：紅土線劃過，指向下一次駐點 */
+@media (prefers-reduced-motion: no-preference) {
+  .km-next__rule {
+    animation: km-draw 620ms cubic-bezier(.2,.7,.3,1) both;
+  }
+}
+@keyframes km-draw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* --------------------------------------------------------- 駐點頁：年曆 */
+/* 列＝月份，欄＝半天。半日標記放在欄首，格子裡只留日期與星期。 */
+
+.km-year__scroll { overflow-x: auto; }
+
+.km-year {
+  width: 100%;
+  border-collapse: collapse;
+}
+.km-year th,
+.km-year td {
+  text-align: left;
+  vertical-align: baseline;
+  padding: 0.8rem 0.75rem 0.8rem 0.85rem;
+}
+.km-year th:first-child,
+.km-year td:first-child { padding-left: 0; }
+
+.km-year thead th {
+  padding-top: 0;
+  padding-bottom: 0.9rem;
+  border-bottom: 3px solid var(--km-laterite);
+}
+.km-year__colhead .km-half {
+  color: var(--km-laterite);
+  margin-right: 0.6rem;
+}
+.km-year__colname {
+  font-family: var(--km-sans);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--km-ink);
+}
+.km-year__colhours {
+  display: block;
+  font-family: var(--km-sans);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--km-stone);
+  margin-top: 0.35rem;
+}
+
+.km-year tbody tr + tr { border-top: 1px solid var(--km-seam-line); }
+.km-year tbody tr:last-child { border-bottom: 1px solid var(--km-seam-line); }
+
+.km-month__name {
+  width: 6rem;
+  font-family: var(--km-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--km-ink);
+}
+.km-month--empty .km-month__name { color: var(--km-stone); font-weight: 400; }
+.km-month__none {
+  font-family: var(--km-serif);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: var(--km-stone);
+  letter-spacing: 0.04em;
+}
+
+.km-slot__date {
+  font-family: var(--km-serif);
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--km-ink);
+  letter-spacing: 0.01em;
+  margin-right: 0.5rem;
+}
+.km-slot__dow {
+  font-family: var(--km-sans);
+  font-size: 0.9375rem;
+  color: var(--km-stone);
+  letter-spacing: 0.06em;
+  margin-right: 0.6rem;
+}
+/* 半天只有在不符合欄首時才需要在格子裡說一次 */
+.km-slot__half { display: none; }
+.km-slot__half.is-deviant {
+  display: inline;
+  font-family: var(--km-sans);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--km-laterite);
+  margin-right: 0.6rem;
+}
+.km-slot__half .km-half { color: var(--km-laterite); margin-right: 0.35rem; }
+.km-slot__tag {
+  font-family: var(--km-sans);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  color: var(--km-stone);
+}
+
+/* 已結束：改用一般字重 + 次要文字色，不再靠壓低亮度 */
+.km-slot.is-past .km-slot__date {
+  font-weight: 400;
+  color: var(--km-stone);
+}
+.km-slot.is-past .km-slot__dow { color: var(--km-stone); }
+
+.km-slot.is-next { box-shadow: inset 4px 0 0 var(--km-laterite); }
+.km-slot.is-next .km-slot__tag { color: var(--km-laterite); font-weight: 700; }
+
+/* ------------------------------------------------------------ 宣導：索引 */
+
+.km-posts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.km-post-item {
+  display: grid;
+  grid-template-columns: 3.25rem 1fr 11rem;
+  gap: 0 1.75rem;
+  align-items: start;
+  padding: 2.25rem 0;
+  border-top: 1px solid var(--km-seam-line);
+}
+.km-post-item:last-child { border-bottom: 1px solid var(--km-seam-line); }
+.km-post-item__no {
+  font-family: var(--km-serif);
+  font-size: 2.5rem;
+  line-height: 1;
+  color: var(--km-laterite);
+  padding-top: 0.15rem;
+}
+.km-post-item__title {
+  font-family: var(--km-serif);
+  font-size: 1.625rem;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  margin: 0 0 0.4rem;
+}
+.km-post-item__title a {
+  color: var(--km-ink);
+  text-decoration: none;
+}
+.km-post-item__title a:hover,
+.km-post-item__title a:focus {
+  color: var(--km-sea);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.km-post-item__sub {
+  font-family: var(--km-serif);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--km-laterite);
+  margin: 0 0 0.75rem;
+  max-width: var(--km-measure);
+}
+.km-post-item__excerpt {
+  font-family: var(--km-serif);
+  font-size: 1rem;
+  line-height: 1.9;
+  color: var(--km-stone);
+  margin: 0;
+  max-width: var(--km-measure);
+}
+.km-post-item__thumb {
+  margin: 0;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--km-seam);
+}
+.km-post-item__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ------------------------------------------------------------ 宣導：單篇 */
+
+.km-article__no {
+  font-family: var(--km-serif);
+  font-size: 2.75rem;
+  line-height: 1;
+  color: var(--km-laterite);
+  margin: 0 0 0.9rem;
+}
+.km-article__title {
+  font-family: var(--km-serif);
+  font-size: 2.125rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: var(--km-ink);
+  margin: 0 0 0.6rem;
+  max-width: 22em;
+}
+.km-article__sub {
+  font-family: var(--km-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--km-laterite);
+  margin: 0 0 1.25rem;
+  max-width: var(--km-measure);
+}
+.km-article__source {
+  font-family: var(--km-sans);
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  color: var(--km-stone);
+  margin: 0;
+  letter-spacing: 0.04em;
+}
+.km-article__source a { color: var(--km-sea); }
+
+.km-figure {
+  margin: 2.5rem 0;
+}
+.km-figure img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 3px;
+}
+.km-figure figcaption {
+  font-family: var(--km-sans);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--km-stone);
+  margin-top: 0.7rem;
+  padding-left: 0.85rem;
+  border-left: 3px solid var(--km-laterite);
+}
+.km-figure--pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.km-figure--pair figcaption { grid-column: 1 / -1; }
+
+/* 文章本體排版 */
+.km-prose {
+  max-width: var(--km-measure);
+  font-family: var(--km-serif);
+  font-size: 1.0625rem;
+  line-height: 1.95;
+  color: var(--km-ink);
+  letter-spacing: 0.01em;
+}
+.km-prose p {
+  margin: 0 0 1.5rem;
+  line-height: 1.95;
+}
+.km-prose h2 {
+  font-family: var(--km-serif);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: var(--km-ink);
+  margin: 2.75rem 0 1.1rem;
+  padding-left: 0.85rem;
+  border-left: 5px solid var(--km-laterite);
+}
+.km-prose h2:first-child { margin-top: 0; }
+.km-prose ol,
+.km-prose ul {
+  margin: 0 0 1.5rem;
+  padding-left: 1.4rem;
+  line-height: 1.95;
+}
+.km-prose li {
+  margin-bottom: 0.65rem;
+  line-height: 1.95;
+}
+.km-prose ol { list-style: decimal; }
+.km-prose ol li::marker {
+  color: var(--km-laterite);
+  font-weight: 700;
+}
+.km-prose ul li::marker { color: var(--km-laterite); }
+.km-prose a {
+  color: var(--km-sea);
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+  overflow-wrap: anywhere;
+}
+.km-prose a:hover, .km-prose a:focus { color: var(--km-sea-deep); }
+.km-prose strong { font-weight: 700; }
+
+.km-note {
+  max-width: var(--km-measure);
+  background: var(--km-seam);
+  border-left: 5px solid var(--km-sea);
+  border-radius: 0 3px 3px 0;
+  padding: 1.1rem 1.25rem;
+  margin: 0 0 2.25rem;
+  font-family: var(--km-sans);
+  font-size: 1rem;
+  line-height: 1.85;
+  color: var(--km-ink);
+}
+.km-note p {
+  margin: 0 0 0.75rem;
+  line-height: 1.85;
+}
+.km-note p:last-child { margin-bottom: 0; }
+.km-note a { color: var(--km-sea); }
+
+/* 文章之間的前後導覽 */
+.km-pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+.km-pager__item {
+  font-family: var(--km-serif);
+}
+.km-pager__item--next { text-align: right; }
+.km-pager__dir {
+  display: block;
+  font-family: var(--km-sans);
+  font-size: 0.875rem;
+  letter-spacing: 0.12em;
+  color: var(--km-stone);
+  margin-bottom: 0.4rem;
+}
+.km-pager__item a {
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--km-ink);
+  text-decoration: none;
+}
+.km-pager__item a:hover,
+.km-pager__item a:focus {
+  color: var(--km-sea);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* --------------------------------------------------------- 行動呼籲區塊 */
+
+.km-cta__text {
+  font-family: var(--km-serif);
+  font-size: 1.125rem;
+  line-height: 1.95;
+  color: var(--km-ink);
+  max-width: var(--km-measure);
+  margin: 0 0 1.5rem;
+}
+.km-button {
+  display: inline-block;
+  font-family: var(--km-sans);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #FBFBF9;
+  background: var(--km-sea);
+  border: 0;
+  border-radius: 4px;
+  padding: 0.85rem 1.9rem;
+  text-decoration: none;
+}
+.km-button:hover,
+.km-button:focus {
+  background: var(--km-sea-deep);
+  color: #fff;
+  text-decoration: none;
+}
+
+/* ------------------------------------------------- 首頁：宣導區塊 */
+/* 外框尺度交給首頁既有的 .section-title，卡片內容沿用宣導頁的紅土序號。
+   六則都有配圖的只有五則，所以首頁這裡不放縮圖，改用副標＋摘要說明內容。 */
+
+.km-teaser {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem 2.75rem;
+}
+.km-teaser__item { margin: 0; }
+
+.km-teaser__link {
+  display: block;
+  border-top: 3px solid var(--km-laterite);
+  padding-top: 1.1rem;
+  text-decoration: none;
+  color: var(--km-ink);
+}
+.km-teaser__no {
+  display: block;
+  font-family: var(--km-serif);
+  font-size: 1.625rem;
+  line-height: 1;
+  color: var(--km-laterite);
+  margin-bottom: 0.55rem;
+}
+.km-teaser__title {
+  display: block;
+  font-family: var(--km-serif);
+  font-size: 1.625rem;
+  font-weight: 700;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  color: var(--km-ink);
+  margin-bottom: 0.35rem;
+}
+.km-teaser__sub {
+  display: block;
+  font-family: var(--km-serif);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--km-laterite);
+  margin-bottom: 0.65rem;
+}
+.km-teaser__excerpt {
+  display: block;
+  font-family: var(--km-serif);
+  font-size: 1.0625rem;
+  line-height: 1.9;
+  color: var(--km-stone);
+}
+.km-teaser__link:hover .km-teaser__title,
+.km-teaser__link:focus .km-teaser__title {
+  color: var(--km-sea);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.km-teaser__link:focus-visible {
+  outline: 3px solid var(--km-sea);
+  outline-offset: 4px;
+}
+
+@media (max-width: 860px) {
+  .km-teaser {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+  }
+  .km-teaser__title { font-size: 1.4375rem; }
+}
+
+/* ------------------------------------------------------------ 麵包屑返回 */
+
+.km-back {
+  font-family: var(--km-sans);
+  font-size: 0.9375rem;
+  letter-spacing: 0.06em;
+  color: var(--km-stone);
+  margin: 0 0 2rem;
+}
+.km-back a {
+  color: var(--km-sea);
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+}
+
+/* ------------------------------------------------------------------ 窄螢幕 */
+
+@media (max-width: 860px) {
+  .km-post-item {
+    grid-template-columns: 2.5rem 1fr;
+    gap: 0 1.1rem;
+  }
+  .km-post-item__thumb {
+    grid-column: 2;
+    grid-row: 2;
+    max-width: 18rem;
+    margin-top: 1.1rem;
+  }
+  .km-post-item__body { grid-column: 2; grid-row: 1; }
+  .km-post-item__no { font-size: 2rem; }
+}
+
+@media (max-width: 680px) {
+  .km-band { padding: 2.5rem 0; }
+  .km-wrap { padding: 0 1.25rem; }
+
+  .km-title { font-size: 1.875rem; }
+  .km-article__title { font-size: 1.625rem; }
+  .km-article__sub { font-size: 1.125rem; }
+
+  .km-next__days { grid-template-columns: 1fr; }
+  .km-next__day + .km-next__day {
+    border-left: 0;
+    border-top: 1px solid var(--km-seam-line);
+  }
+  .km-next__date { font-size: 2.125rem; }
+
+  .km-year th,
+  .km-year td { padding: 0.55rem 0.5rem 0.55rem 0.6rem; }
+  .km-month__name { width: 4.25rem; font-size: 1.0625rem; letter-spacing: 0.12em; }
+  .km-slot__date { font-size: 1.125rem; margin-right: 0.35rem; }
+  .km-slot__dow { font-size: 0.875rem; margin-right: 0.4rem; }
+  .km-slot__tag { font-size: 0.8125rem; }
+  .km-year__colname { font-size: 0.9375rem; }
+  .km-year__colhours { font-size: 0.8125rem; }
+  .km-year__colhead .km-half { margin-right: 0.4rem; }
+
+  .km-figure--pair { grid-template-columns: 1fr; }
+
+  .km-pager { grid-template-columns: 1fr; gap: 1.75rem; }
+  .km-pager__item--next { text-align: left; }
+
+  .km-strip a { margin-left: 0; }
+
+}
+
+@media (max-width: 420px) {
+  .km-nav__list a { padding: 0.85rem 0.7rem; font-size: 0.9375rem; }
+}
+
+/* ------------------------------------------------------------------- 列印 */
+
+@media print {
+  .km-nav, .km-strip, .km-cta, .km-pager, .km-back { display: none; }
+  .km-band { padding: 1rem 0; background: #fff; }
+  .km-band--seam { background: #fff; }
+}
+
+/* 直式插畫不撐滿整個文欄 */
+.km-figure--portrait img { max-width: 26rem; }
+
+/* 沒有配圖的文章，本文佔滿右側 */
+.km-post-item--noimage .km-post-item__body { grid-column: 2 / -1; }
+
+/* 跳到主要內容 */
+.km-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--km-ink);
+  color: #fff;
+  font-family: var(--km-sans);
+  padding: 0.85rem 1.4rem;
+  text-decoration: none;
+}
+.km-skip:focus {
+  left: 0;
+  color: #fff;
+}
+
+.km-strip__inner > [data-km-strip] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.9rem;
+}
+
+/* 窄螢幕：已結束改成只留給螢幕閱讀器，避免「已結／束」斷行 */
+@media (max-width: 560px) {
+  .km-slot__date, .km-slot__dow, .km-slot__tag { white-space: nowrap; }
+  .km-slot.is-past .km-slot__tag {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0);
+    border: 0;
+  }
+}

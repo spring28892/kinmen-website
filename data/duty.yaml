@@ -1,0 +1,55 @@
+# 金門縣水土保持服務團 技師駐點時間
+# 來源：金門縣政府 115 年度駐點日期來文
+# 維護方式：換年度時，改 year / westernYear，並重寫 sessions 清單即可，頁面會自動更新。
+
+year: 115
+westernYear: 2026
+location: 金門縣政府產業發展處農林科辦公室
+hours:
+  am: "08:30–12:00"
+  pm: "13:30–17:30"
+sessions:
+  - date: "2026-01-21"   # 三
+    half: pm
+  - date: "2026-01-22"   # 四
+    half: am
+  - date: "2026-03-18"   # 三
+    half: pm
+  - date: "2026-03-19"   # 四
+    half: am
+  - date: "2026-04-22"   # 三
+    half: pm
+  - date: "2026-04-23"   # 四
+    half: am
+  - date: "2026-05-20"   # 三
+    half: pm
+  - date: "2026-05-21"   # 四
+    half: am
+  - date: "2026-06-24"   # 三
+    half: pm
+  - date: "2026-06-25"   # 四
+    half: am
+  - date: "2026-07-22"   # 三
+    half: pm
+  - date: "2026-07-23"   # 四
+    half: am
+  - date: "2026-08-19"   # 三
+    half: pm
+  - date: "2026-08-20"   # 四
+    half: am
+  - date: "2026-09-16"   # 三
+    half: pm
+  - date: "2026-09-17"   # 四
+    half: am
+  - date: "2026-10-21"   # 三
+    half: pm
+  - date: "2026-10-22"   # 四
+    half: am
+  - date: "2026-11-18"   # 三
+    half: pm
+  - date: "2026-11-19"   # 四
+    half: am
+  - date: "2026-12-16"   # 三
+    half: pm
+  - date: "2026-12-17"   # 四
+    half: am

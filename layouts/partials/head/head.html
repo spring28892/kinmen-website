@@ -1,0 +1,39 @@
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-TSZDRRZVWX"></script>
+	<script>
+  		window.dataLayer = window.dataLayer || [];
+  		function gtag(){dataLayer.push(arguments);}
+  		gtag('js', new Date());
+
+		gtag('config', 'G-TSZDRRZVWX');
+	</script>
+
+	<title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }}｜{{ .Site.Params.shortTitle | default .Site.Title }}{{ end }}</title>
+	<link rel="shortcut icon" href="{{ .Site.BaseURL }}{{ .Site.Params.favicon }}">
+
+	<!-- Bootstrap -->
+	<link href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.no-icons.min.css" rel="stylesheet">
+
+	<!-- Icons -->
+	<script defer src="https://use.fontawesome.com/releases/v5.0.11/js/all.js" integrity="sha384-ImVoB8Er8knetgQakxuBS4G3RSkyD8IZVVQCAnmRJrDwqJFYUE4YOv+DbIofcO9C" crossorigin="anonymous"></script>
+
+	<!-- Fonts -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Alice|Open+Sans:400,300,700">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@400;700&display=swap">
+
+	{{ $styles := resources.Get "css/styles.css" }}
+  	{{ $css := $styles | resources.Minify | resources.Fingerprint "sha512"  }}
+  	<link rel="stylesheet" href="{{ $css.Permalink }}" integrity="{{ $css.Data.Integrity }}">
+
+	{{ $km := resources.Get "css/kinmen.css" }}
+	{{ $kmcss := $km | resources.Minify | resources.Fingerprint "sha512" }}
+	<link rel="stylesheet" href="{{ $kmcss.Permalink }}" integrity="{{ $kmcss.Data.Integrity }}">
+
+  <!-- Share this -->
+  {{ if .Site.Params.customsharethis }}
+	<script type="text/javascript" src="//platform-api.sharethis.com/js/sharethis.js#property={{ .Site.Params.sharethis.property }}&product=custom-share-buttons"></script>
+	{{ end }}
+
+	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>

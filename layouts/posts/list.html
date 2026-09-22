@@ -1,0 +1,40 @@
+{{ define "main" }}
+<main id="main">
+
+  <section class="km-band km-band--seam">
+    <div class="km-wrap">
+      <h1 class="km-title">水保宣導</h1>
+      <p class="km-lede">金門縣政府產業發展處發布的六篇水土保持宣導，全文收錄在這裡。從衛星怎麼看坡地、花崗岩為什麼也會崩，到整理自家土地前該先找哪個窗口。</p>
+    </div>
+  </section>
+
+  <section class="km-band">
+    <div class="km-wrap">
+      <ol class="km-posts">
+        {{ range .Pages.ByWeight }}
+          {{ $fig := .Params.figure }}
+          {{ $thumb := "" }}
+          {{ with $fig }}
+            {{ $src := resources.Get (index .images 0).src }}
+            {{ if $src }}{{ $thumb = $src.Fill "560x420 Smart webp q80" }}{{ end }}
+          {{ end }}
+          <li class="km-post-item{{ if not $thumb }} km-post-item--noimage{{ end }}">
+            <span class="km-post-item__no" aria-hidden="true">{{ .Params.serial }}</span>
+            <div class="km-post-item__body">
+              <h2 class="km-post-item__title"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+              <p class="km-post-item__sub">{{ .Params.subtitle }}</p>
+              <p class="km-post-item__excerpt">{{ .Params.excerpt }}</p>
+            </div>
+            {{ with $thumb }}
+              <span class="km-post-item__thumb"><img src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="" loading="lazy" decoding="async"></span>
+            {{ end }}
+          </li>
+        {{ end }}
+      </ol>
+    </div>
+  </section>
+
+  {{ partial "kinmen/cta.html" . }}
+
+</main>
+{{ end }}

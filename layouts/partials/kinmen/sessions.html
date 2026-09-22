@@ -1,0 +1,24 @@
+{{- /*
+  把 data/duty.yaml 的駐點場次展開成模板好用的形狀。
+  建置當下就算好「已結束」，沒有 JavaScript 也看得到合理的結果；
+  assets/js/kinmen.js 會在瀏覽器端用使用者的當下再校正一次。
+*/ -}}
+{{- $duty := site.Data.duty -}}
+{{- $dow := slice "週日" "週一" "週二" "週三" "週四" "週五" "週六" -}}
+{{- $out := slice -}}
+{{- range $duty.sessions -}}
+  {{- $isAM := eq .half "am" -}}
+  {{- $start := time (printf "%s%s" .date (cond $isAM "T08:30:00+08:00" "T13:30:00+08:00")) -}}
+  {{- $end := time (printf "%s%s" .date (cond $isAM "T12:00:00+08:00" "T17:30:00+08:00")) -}}
+  {{- $out = $out | append (dict
+      "date" .date
+      "half" .half
+      "halfName" (cond $isAM "上午" "下午")
+      "hours" (index $duty.hours .half)
+      "month" (int $start.Month)
+      "day" (int $start.Day)
+      "dow" (index $dow (int $start.Weekday))
+      "over" ($end.Before now)
+  ) -}}
+{{- end -}}
+{{- return $out -}}

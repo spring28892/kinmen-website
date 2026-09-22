@@ -1,0 +1,4 @@
+{{- $duty := site.Data.duty -}}
+<script type="application/json" id="km-duty-data">{{ (dict "year" $duty.year "hours" $duty.hours "sessions" $duty.sessions) | jsonify | safeJS }}</script>
+{{ $js := resources.Get "js/kinmen.js" | resources.Minify | resources.Fingerprint "sha512" }}
+<script defer src="{{ $js.Permalink }}" integrity="{{ $js.Data.Integrity }}"></script>

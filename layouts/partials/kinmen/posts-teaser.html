@@ -1,0 +1,21 @@
+{{- $posts := (where .Site.RegularPages "Section" "posts").ByWeight -}}
+{{- if $posts -}}
+{{/* 首頁的宣導區塊：沿用首頁既有的 section-title 樣式，讓它和「相關連結」「指導單位」
+     是同一個尺度；卡片內容才帶入宣導頁的紅土序號與字級。 */}}
+<div class="row section topspace">
+  <h2 class="section-title"><span>水保宣導</span></h2>
+
+  <ul class="km-teaser">
+    {{ range $posts }}
+    <li class="km-teaser__item">
+      <a class="km-teaser__link" href="{{ .RelPermalink }}">
+        <span class="km-teaser__no" aria-hidden="true">{{ .Params.serial }}</span>
+        <span class="km-teaser__title">{{ .Title }}</span>
+        <span class="km-teaser__sub">{{ .Params.subtitle }}</span>
+        <span class="km-teaser__excerpt">{{ .Params.excerpt }}</span>
+      </a>
+    </li>
+    {{ end }}
+  </ul>
+</div>
+{{- end -}}

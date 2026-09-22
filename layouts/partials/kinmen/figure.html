@@ -1,0 +1,14 @@
+{{- /* 文章配圖。front matter 的 figure 區塊：layout（single / pair / portrait）、caption、images。 */ -}}
+{{- with . -}}
+{{- $layout := .layout | default "single" -}}
+<figure class="km-figure{{ if eq $layout "pair" }} km-figure--pair{{ else if eq $layout "portrait" }} km-figure--portrait{{ end }}">
+  {{- range .images -}}
+    {{- $img := resources.Get .src -}}
+    {{- if $img -}}
+      {{- $wide := $img.Resize "1000x webp q82" -}}
+      <img src="{{ $wide.RelPermalink }}" width="{{ $wide.Width }}" height="{{ $wide.Height }}" alt="{{ .alt }}" loading="lazy" decoding="async">
+    {{- end -}}
+  {{- end -}}
+  {{- with .caption }}<figcaption>{{ . | markdownify }}</figcaption>{{ end -}}
+</figure>
+{{- end -}}

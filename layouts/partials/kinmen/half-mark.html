@@ -1,0 +1,4 @@
+{{- /* 半日標記：一分為二的方塊，左半＝上午，右半＝下午。本設計的核心圖形。 */ -}}
+{{- $half := .half -}}
+{{- $lg := .large | default false -}}
+<span class="km-half km-half--{{ $half }}{{ if $lg }} km-half--lg{{ end }}" aria-hidden="true"><span></span><span></span></span>

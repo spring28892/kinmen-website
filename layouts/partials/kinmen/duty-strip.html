@@ -1,0 +1,17 @@
+{{- $n := partial "kinmen/next.html" . -}}
+<div class="km-strip">
+  <div class="km-strip__inner">
+    <span class="km-strip__label">下一次技師駐點</span>
+    <span data-km-strip>
+      {{- if gt (len $n.session) 0 -}}
+        <span class="km-strip__when">{{ $n.session.month }}月{{ $n.session.day }}日 {{ $n.session.dow }}{{ partial "kinmen/half-mark.html" (dict "half" $n.session.half) }}{{ $n.session.halfName }} {{ $n.session.hours }}</span>
+        <span class="km-strip__count">
+          {{- if eq $n.days 0 }}就是今天{{ else if eq $n.days 1 }}明天{{ else }}還有 {{ $n.days }} 天{{ end -}}
+        </span>
+      {{- else -}}
+        <span class="km-strip__when">民國 {{ site.Data.duty.year }} 年駐點場次已全部結束</span>
+      {{- end -}}
+    </span>
+    <a href="{{ "/schedule/" | relURL }}">看全年駐點日</a>
+  </div>
+</div>

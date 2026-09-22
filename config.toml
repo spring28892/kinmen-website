@@ -1,9 +1,11 @@
 baseURL = "https://kinmen-swcg.netlify.app/"
-languageCode = "en"
+languageCode = "zh-Hant-TW"
+timeZone = "Asia/Taipei"
 title = "金門縣水土保持服務團 - 為金門縣水土保持盡一份心"
 theme = "hugo-initio"
 
 [params]
+    shortTitle = "金門縣水土保持服務團"
     phone = "02-82581918"
     address = "22043 新北市板橋區雙十路2段143號4樓"
     year = 2023
@@ -45,5 +47,23 @@ theme = "hugo-initio"
     sharethis = true
     network = "email"
 
+# tags 只用來產生每一頁的 keywords，不需要分類頁
+[taxonomies]
+
 [params.meta]
     keywords = "水土保持, 水保, 金門, 服務團, 水土保持技師"
+
+[[menu.main]]
+    name = "線上預約"
+    url = "/"
+    weight = 1
+
+[[menu.main]]
+    name = "駐點時間"
+    url = "/schedule/"
+    weight = 2
+
+[[menu.main]]
+    name = "水保宣導"
+    url = "/posts/"
+    weight = 3

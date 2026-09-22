@@ -1,0 +1,34 @@
+{{- /*
+  找出「下一趟駐點」。相鄰兩個半天（週三下午＋週四上午）算同一趟。
+  回傳 dict：sessions（全部場次）、visit（下一趟的兩個半天）、session（下一個還沒結束的半天）、days（還有幾天）。
+*/ -}}
+{{- $sessions := partial "kinmen/sessions.html" . -}}
+
+{{- /* 每一趟的第二個半天落在奇數索引；第一個還沒結束的，就是下一趟。 */ -}}
+{{- $visitStart := -1 -}}
+{{- range $i, $s := $sessions -}}
+  {{- if and (eq $visitStart -1) (eq (mod $i 2) 1) (not $s.over) -}}
+    {{- $visitStart = sub $i 1 -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $visit := slice -}}
+{{- if ge $visitStart 0 -}}
+  {{- $visit = slice (index $sessions $visitStart) (index $sessions (add $visitStart 1)) -}}
+{{- end -}}
+
+{{- $session := dict -}}
+{{- range $sessions -}}
+  {{- if and (eq (len $session) 0) (not .over) -}}
+    {{- $session = . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- $days := -1 -}}
+{{- if gt (len $session) 0 -}}
+  {{- $today := time (printf "%sT00:00:00+08:00" (now.Format "2006-01-02")) -}}
+  {{- $that := time (printf "%sT00:00:00+08:00" $session.date) -}}
+  {{- $days = int (div (sub $that.Unix $today.Unix) 86400) -}}
+{{- end -}}
+
+{{- return (dict "sessions" $sessions "visit" $visit "session" $session "days" $days) -}}

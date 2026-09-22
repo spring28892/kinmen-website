@@ -1,0 +1,7 @@
+# Hugo 建置產出與快取，不需要進版控
+/public/
+/resources/
+.hugo_build.lock
+
+# Windows 複製檔案時留下的殘檔
+*:Zone.Identifier

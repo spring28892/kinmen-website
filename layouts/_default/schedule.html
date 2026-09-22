@@ -1,0 +1,110 @@
+{{ define "main" }}
+{{ $duty := site.Data.duty }}
+{{ $n := partial "kinmen/next.html" . }}
+{{ $monthNames := slice "一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月" }}
+{{ $nextKey := "" }}
+{{ if gt (len $n.session) 0 }}{{ $nextKey = printf "%s|%s" $n.session.date $n.session.half }}{{ end }}
+
+<main id="main">
+
+  {{/* 開場：標題、一句話、以及全站唯一的方框——下一次駐點 */}}
+  <section class="km-band km-band--seam">
+    <div class="km-wrap">
+      <h1 class="km-title">民國 {{ $duty.year }} 年技師駐點日</h1>
+      <p class="km-lede">每個月兩個半天，水土保持技師在{{ $duty.location }}現場受理諮詢。免費，不用先預約，帶著地號或現場照片直接過來就可以。</p>
+
+      <div class="km-next">
+        <div class="km-next__head">
+          <h2 class="km-next__label" id="km-next-h">下一次駐點</h2>
+          <p class="km-next__count" data-km-count>
+            {{- if gt (len $n.session) 0 -}}
+              {{- if eq $n.days 0 }}就是今天
+              {{- else if eq $n.days 1 }}明天
+              {{- else }}還有 {{ $n.days }} 天{{ end -}}
+            {{- end -}}
+          </p>
+        </div>
+
+        <div class="km-next__card" data-km-card aria-labelledby="km-next-h">
+          <div class="km-next__rule"></div>
+          {{ if eq (len $n.visit) 0 }}
+            <p class="km-next__closed">{{ $duty.year }} 年的駐點場次已經全部結束。下一年度的日期由金門縣政府核定後，會更新在這一頁。在這之前仍可以線上預約或來電洽詢。</p>
+          {{ else }}
+            <div class="km-next__days">
+              {{ range $n.visit }}
+              <div class="km-next__day{{ if .over }} is-done{{ end }}">
+                <p class="km-next__date">{{ .month }}月{{ .day }}日<b>{{ .dow }}</b></p>
+                <p class="km-next__mark">{{ partial "kinmen/half-mark.html" (dict "half" .half "large" true) }}{{ .halfName }}{{ if .over }}<span class="km-next__done">已結束</span>{{ end }}</p>
+                <p class="km-next__hours">{{ .hours }}</p>
+              </div>
+              {{ end }}
+            </div>
+          {{ end }}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{/* 全年場次。左欄永遠是下午、右欄永遠是上午，所以半日標記放在欄首，
+       而不是在每一格重複 22 次。某一格若不符合欄首，才另外標出來。 */}}
+  {{ $cols := slice }}
+  {{ range $i := (seq 12) }}
+    {{ $slots := where $n.sessions "month" $i }}
+    {{ if and (eq (len $cols) 0) (gt (len $slots) 0) }}
+      {{ range $slots }}{{ $cols = $cols | append .half }}{{ end }}
+    {{ end }}
+  {{ end }}
+
+  <section class="km-band" aria-labelledby="km-year-h">
+    <div class="km-wrap">
+      <h2 class="km-h2" id="km-year-h">全年場次</h2>
+      <div class="km-year__scroll" role="region" aria-labelledby="km-year-h" tabindex="0">
+      <table class="km-year">
+        <caption class="km-sr">民國 {{ $duty.year }} 年金門縣水土保持服務團技師駐點日期一覽</caption>
+        <thead>
+          <tr>
+            <th scope="col"><span class="km-sr">月份</span></th>
+            {{ range $cols }}
+              {{ $isAM := eq . "am" }}
+              <th scope="col" class="km-year__colhead">
+                {{ partial "kinmen/half-mark.html" (dict "half" .) }}
+                <span class="km-year__colname">{{ cond $isAM "上午" "下午" }}</span>
+                <span class="km-year__colhours">{{ index $duty.hours . }}</span>
+              </th>
+            {{ end }}
+          </tr>
+        </thead>
+        <tbody>
+        {{ range $i := (seq 12) }}
+          {{ $slots := where $n.sessions "month" $i }}
+          <tr{{ if eq (len $slots) 0 }} class="km-month--empty"{{ end }}>
+            <th scope="row" class="km-month__name">{{ index $monthNames (sub $i 1) }}</th>
+            {{ if eq (len $slots) 0 }}
+              <td class="km-month__none" colspan="{{ len $cols }}">這個月沒有安排駐點</td>
+            {{ else }}
+              {{ range $k, $s := $slots }}
+                {{ $isNext := and (ne $nextKey "") (eq $nextKey (printf "%s|%s" $s.date $s.half)) }}
+                {{ $deviant := or (ge $k (len $cols)) (ne $s.half (index $cols (cond (lt $k (len $cols)) $k 0))) }}
+                <td class="km-slot{{ if $s.over }} is-past{{ end }}{{ if $isNext }} is-next{{ end }}"
+                    data-km-slot="{{ $s.date }}" data-km-half="{{ $s.half }}">
+                  <span class="km-slot__date">{{ $s.month }}/{{ $s.day }}</span>
+                  <span class="km-slot__dow">{{ $s.dow }}</span>
+                  <span class="km-slot__half{{ if $deviant }} is-deviant{{ end }}">{{ partial "kinmen/half-mark.html" (dict "half" $s.half) }}{{ $s.halfName }}</span>
+                  <span class="km-slot__tag" data-km-tag>{{ if $s.over }}已結束{{ else if $isNext }}下一場{{ end }}</span>
+                </td>
+              {{ end }}
+            {{ end }}
+          </tr>
+        {{ end }}
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </section>
+
+  {{ partial "kinmen/cta.html" . }}
+
+</main>
+
+{{ partial "kinmen/duty-data.html" . }}
+{{ end }}

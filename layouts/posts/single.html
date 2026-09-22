@@ -1,0 +1,57 @@
+{{ define "main" }}
+{{ $all := (where .Site.RegularPages "Section" "posts").ByWeight }}
+{{ $i := -1 }}
+{{ range $k, $p := $all }}{{ if eq $p.RelPermalink $.RelPermalink }}{{ $i = $k }}{{ end }}{{ end }}
+{{ $prev := "" }}{{ if gt $i 0 }}{{ $prev = index $all (sub $i 1) }}{{ end }}
+{{ $next := "" }}{{ if and (ge $i 0) (lt $i (sub (len $all) 1)) }}{{ $next = index $all (add $i 1) }}{{ end }}
+
+<main id="main">
+  <article>
+
+    <header class="km-band km-band--seam">
+      <div class="km-wrap km-wrap--text">
+        <p class="km-back"><a href="{{ "/posts/" | relURL }}">回水保宣導</a></p>
+        <p class="km-article__no" aria-hidden="true">{{ .Params.serial }}</p>
+        <h1 class="km-article__title">{{ .Title }}</h1>
+        <p class="km-article__sub">{{ .Params.subtitle }}</p>
+        <p class="km-article__source">這篇宣導由金門縣政府產業發展處發布，也可以<a href="{{ .Params.source }}" target="_blank" rel="noreferrer">看原始公告</a>。</p>
+      </div>
+    </header>
+
+    <div class="km-band">
+      <div class="km-wrap km-wrap--text">
+        {{ with .Params.note }}<aside class="km-note">{{ . | markdownify }}</aside>{{ end }}
+        {{ partial "kinmen/figure.html" .Params.figure }}
+        <div class="km-prose">
+          {{ .Content }}
+        </div>
+      </div>
+    </div>
+
+  </article>
+
+  {{ if or $prev $next }}
+  <section class="km-band km-band--seam">
+    <div class="km-wrap km-wrap--text">
+      <nav class="km-pager" aria-label="其他宣導文章">
+        <div class="km-pager__item km-pager__item--prev">
+          {{ with $prev }}
+            <span class="km-pager__dir">上一篇</span>
+            <a href="{{ .RelPermalink }}">{{ .Params.serial }}　{{ .Title }}</a>
+          {{ end }}
+        </div>
+        <div class="km-pager__item km-pager__item--next">
+          {{ with $next }}
+            <span class="km-pager__dir">下一篇</span>
+            <a href="{{ .RelPermalink }}">{{ .Params.serial }}　{{ .Title }}</a>
+          {{ end }}
+        </div>
+      </nav>
+    </div>
+  </section>
+  {{ end }}
+
+  {{ partial "kinmen/cta.html" . }}
+
+</main>
+{{ end }}

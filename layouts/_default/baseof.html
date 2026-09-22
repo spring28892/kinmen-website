@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="{{ with .Site.LanguageCode }}{{ . }}{{ else }}zh-Hant-TW{{ end }}">
+  <head>
+  	<meta charset="utf-8">
+  	<meta name="viewport"    content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}金門縣水土保持技師服務團{{ end }}"/>
+    <meta name="keywords" content="{{ with .Params.tags }}{{ delimit . ", " }}, {{ end }}{{ .Site.Params.meta.keywords }}"/>
+    <meta name="referrer" content="no-referrer-when-downgrade" />
+  	<meta name="author"      content="{{ .Site.Params.shortTitle | default .Site.Title }}">
+
+    {{ partial "head/head.html" . }}
+  </head>
+
+  <body class="home">
+
+    <a class="km-skip" href="#main">跳到主要內容</a>
+
+    {{ block "header" . }}
+      {{ partial "head/header.html" . }}
+    {{ end }}
+
+    {{ block "main" . }}
+    {{ end }}
+
+    {{ block "footer" . }}
+      {{ partial "footer/footer.html" . }}
+    {{ end }}
+  </body>
+
+</html>
