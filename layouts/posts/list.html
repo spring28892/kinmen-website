@@ -16,7 +16,7 @@
           {{ $thumb := "" }}
           {{ with $fig }}
             {{ $src := resources.Get (index .images 0).src }}
-            {{ if $src }}{{ $thumb = $src.Fill "560x420 Smart webp q80" }}{{ end }}
+            {{ if $src }}{{ $thumb = $src.Fill "560x420 Smart q80" }}{{ end }}
           {{ end }}
           <li class="km-post-item{{ if not $thumb }} km-post-item--noimage{{ end }}">
             <span class="km-post-item__no" aria-hidden="true">{{ .Params.serial }}</span>

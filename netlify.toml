@@ -1,0 +1,22 @@
+# Netlify 建置設定
+#
+# 這個檔案會覆蓋 Netlify 網頁後台的 Build command 與 Publish directory。
+# 把設定放進版控，出問題時才查得出原因 —— 先前後台只設了 `hugo`，
+# 但建置環境裡沒有這個指令，建置就以 exit 127（hugo: command not found）失敗。
+
+[build]
+  publish = "public"
+  command = "hugo --gc --minify"
+
+[build.environment]
+  # Netlify 的建置映像檔沒有內建 Hugo，必須指定版本才會下載安裝。
+  # 少了這一行就是 "hugo: command not found"。
+  #
+  # 這裡釘在 0.123.7，是本地實測可正常建置的版本。要升版請先在本地
+  # 跑過 `hugo --gc --minify` 確認佈景主題沒有壞（hugo-initio 用了幾個
+  # 已被棄用的寫法，例如 .Data.Pages）。
+  HUGO_VERSION = "0.123.7"
+
+  # 「下一次駐點」在建置時會先算一份，作為沒有 JavaScript 時的後備值。
+  # 指定台北時區，這個後備值才不會算在 UTC 上。
+  TZ = "Asia/Taipei"
